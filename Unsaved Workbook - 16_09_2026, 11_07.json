@@ -1,0 +1,57 @@
+{
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workbookDisplayName": {
+      "type": "string",
+      "defaultValue": "Unsaved Workbook - 16/09/2026, 11:07",
+      "metadata": {
+        "description": "The friendly name for the workbook that is used in the Gallery or Saved List.  This name must be unique within a resource group."
+      }
+    },
+    "workbookType": {
+      "type": "string",
+      "defaultValue": "workbook",
+      "metadata": {
+        "description": "The gallery that the workbook will been shown under. Supported values include workbook, tsg, etc. Usually, this is 'workbook'"
+      }
+    },
+    "workbookSourceId": {
+      "type": "string",
+      "defaultValue": "/subscriptions/574a07c8-b128-4a24-ac5f-1b8550b5a804/resourceGroups/logic-app/providers/Microsoft.OperationalInsights/workspaces/news-monitoring-workspace",
+      "metadata": {
+        "description": "The id of resource instance to which the workbook will be associated"
+      }
+    },
+    "workbookId": {
+      "type": "string",
+      "defaultValue": "[newGuid()]",
+      "metadata": {
+        "description": "The unique guid for this workbook instance"
+      }
+    }
+  },
+  "resources": [
+    {
+      "name": "[parameters('workbookId')]",
+      "type": "microsoft.insights/workbooks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2022-04-01",
+      "dependsOn": [],
+      "kind": "shared",
+      "properties": {
+        "displayName": "[parameters('workbookDisplayName')]",
+        "serializedData": "{\"version\":\"Notebook/1.0\",\"items\":[{\"type\":1,\"content\":{\"json\":\"## New workbook\\n---\\n\\nWelcome to your new workbook.  This area will display text formatted as markdown.\\n\\n\\nWe've included a basic analytics query to get you started. Use the `Edit` button below each section to configure it or add more sections.\"},\"name\":\"text - 2\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"union withsource=[\\\"$TableName\\\"] *\\n| summarize Count=count() by TableName=[\\\"$TableName\\\"]\\n| render barchart\",\"size\":1,\"timeContext\":{\"durationMs\":86400000},\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\"},\"name\":\"query - 2\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"AzureDiagnostics\\r\\n| where ResourceProvider == \\\"MICROSOFT.LOGIC\\\"\\r\\n| where Category == \\\"WorkflowRuntime\\\"\\r\\n| where OperationName == \\\"Microsoft.Logic/workflows/workflowRunCompleted\\\"\\r\\n| summarize TotalRuns = count() by Name = resource_workflowName_s\\r\\n| order by TotalRuns desc\\r\\n\",\"size\":0,\"timeContext\":{\"durationMs\":86400000},\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\"},\"name\":\"query - 2\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"AzureDiagnostics\\r\\n| where ResourceProvider == \\\"MICROSOFT.LOGIC\\\"\\r\\n| where Category == \\\"WorkflowRuntime\\\"\\r\\n| where OperationName == \\\"Microsoft.Logic/workflows/workflowRunCompleted\\\"\\r\\n// 1. Calculate duration in seconds (if not explicitly provided as duration_d)\\r\\n| extend DurationSec = (endTime_t - startTime_t) / 1s\\r\\n// 2. Identify the status of the run\\r\\n| extend Status = status_s\\r\\n// 3. Aggregate metrics per Logic App\\r\\n| summarize \\r\\n    TotalRuns = count(),\\r\\n    Succeeded = countif(Status == \\\"Succeeded\\\"),\\r\\n    FailedRuns = countif(Status == \\\"Failed\\\"),\\r\\n    CancelledRuns = countif(Status == \\\"Cancelled\\\"),\\r\\n    SlowRuns = countif(DurationSec > 5), // Adjust '5' to your threshold in seconds\\r\\n    AvgDurationSec = avg(DurationSec)\\r\\n    by LogicAppName = resource_workflowName_s\\r\\n| order by FailedRuns desc, SlowRuns desc\\r\\n\",\"size\":0,\"timeContext\":{\"durationMs\":86400000},\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\"},\"name\":\"query - 3\"}],\"isLocked\":false,\"fallbackResourceIds\":[\"/subscriptions/574a07c8-b128-4a24-ac5f-1b8550b5a804/resourceGroups/logic-app/providers/Microsoft.OperationalInsights/workspaces/news-monitoring-workspace\"]}",
+        "version": "1.0",
+        "sourceId": "[parameters('workbookSourceId')]",
+        "category": "[parameters('workbookType')]"
+      }
+    }
+  ],
+  "outputs": {
+    "workbookId": {
+      "type": "string",
+      "value": "[resourceId( 'microsoft.insights/workbooks', parameters('workbookId'))]"
+    }
+  },
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#"
+}

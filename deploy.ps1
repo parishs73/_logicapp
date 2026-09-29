@@ -1,0 +1,1 @@
+workflowNames = $(az )

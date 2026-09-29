@@ -1,0 +1,190 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## New workbook\n---\n\nWelcome to your new workbook.  This area will display text formatted as markdown.\n\n\nWe've included a basic analytics query to get you started. Use the `Edit` button below each section to configure it or add more sections."
+      },
+      "name": "text - 2"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "86afb459-f2ec-4462-a192-ba179f037818",
+            "version": "KqlParameterItem/1.0",
+            "name": "RSS_Feed",
+            "type": 2,
+            "isRequired": true,
+            "query": "AzureDiagnostics\r\n| where ResourceGroup == \"LOGIC-APP\"\r\n| summarize by RSS_Feed = resource_workflowName_s\r\n| order by RSS_Feed asc\r\n",
+            "crossComponentResources": [
+              "/subscriptions/574a07c8-b128-4a24-ac5f-1b8550b5a804/resourceGroups/logic-app/providers/Microsoft.OperationalInsights/workspaces/news-monitoring-workspace"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "selectAllValue": "*",
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces",
+            "value": "value::all"
+          },
+          {
+            "id": "93631e61-5b4c-449a-ab5e-787a093a15c2",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "type": 4,
+            "isRequired": true,
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 300000
+                },
+                {
+                  "durationMs": 900000
+                },
+                {
+                  "durationMs": 1800000
+                },
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 259200000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 1209600000
+                },
+                {
+                  "durationMs": 2419200000
+                },
+                {
+                  "durationMs": 2592000000
+                },
+                {
+                  "durationMs": 5184000000
+                },
+                {
+                  "durationMs": 7776000000
+                }
+              ]
+            },
+            "value": {
+              "durationMs": 14400000
+            }
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "workflow-dropdown"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "union withsource=[\"$TableName\"] *\n| where TimeGenerated {TimeRange}\n| where \"{RSS_Feed}\" in (\"*\" ,\"\", \"All\") or resource_workflowName_s == \"{RSS_Feed}\"\n\n| summarize Count=count() by TableName=[\"$TableName\"], bin(TimeGenerated, 1h)\n| render barchart",
+        "size": 1,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "query - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "union withsource=[\"$TableName\"] *\n| where \"{RSS_Feed}\" in (\"*\" ,\"\", \"All\") or resource_workflowName_s == \"{RSS_Feed}\"\n| summarize Count=count() by TableName=[\"$TableName\"], bin(TimeGenerated, 1h)\n| render timechart",
+        "size": 1,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "query - 3 time chart"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureDiagnostics\n| where ResourceGroup ==\"LOGIC-APP\" and Category == \"WorkflowRuntime\"\n| where \"{RSS_Feed}\" in (\"*\" ,\"\", \"All\") or resource_workflowName_s == \"{RSS_Feed}\"\n| summarize Count = count() by ResourceType, Resource, resource_workflowName_s, status_s, bin(TimeGenerated, 1h)\n| render timechart",
+        "size": 1,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "query - 3 time chart - Copy"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureDiagnostics\r\n| where ResourceProvider == \"MICROSOFT.LOGIC\"\r\n| where Category == \"WorkflowRuntime\"\r\n| where \"{RSS_Feed}\" in (\"*\" ,\"\", \"All\") or resource_workflowName_s == \"{RSS_Feed}\"\r\n| where OperationName == \"Microsoft.Logic/workflows/workflowRunCompleted\"\r\n| summarize TotalRuns = count() by Name = resource_workflowName_s\r\n| order by TotalRuns desc\r\n",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 14400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "query - 2"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureDiagnostics\r\n| where ResourceProvider == \"MICROSOFT.LOGIC\"\r\n| where Category == \"WorkflowRuntime\"\r\n| where OperationName == \"Microsoft.Logic/workflows/workflowRunCompleted\"\r\n| where \"{RSS_Feed}\" in (\"*\" ,\"\", \"All\") or resource_workflowName_s == \"{RSS_Feed}\"\r\n// 1. Calculate duration in seconds (if not explicitly provided as duration_d)\r\n| extend DurationSec = (endTime_t - startTime_t) / 1s\r\n// 2. Identify the status of the run\r\n| extend Status = status_s\r\n// 3. Aggregate metrics per Logic App\r\n| summarize \r\n    TotalRuns = count(),\r\n    Succeeded = countif(Status == \"Succeeded\"),\r\n    FailedRuns = countif(Status == \"Failed\"),\r\n    CancelledRuns = countif(Status == \"Cancelled\"),\r\n    SlowRuns = countif(DurationSec > 5), // Adjust '5' to your threshold in seconds\r\n    AvgDurationSec = avg(DurationSec)\r\n    by LogicAppName = resource_workflowName_s\r\n| order by FailedRuns desc, SlowRuns desc\r\n",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "query - 3"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AzureDiagnostics \r\n| where ResourceProvider == \"MICROSOFT.LOGIC\"\r\n| where Category == \"WorkflowRuntime\"\r\n| where \"{RSS_Feed}\" in (\"*\" ,\"\", \"All\") or resource_workflowName_s == \"{RSS_Feed}\"\r\n| summarize\r\n    Total = count() by status_s, resource_workflowName_s, OperationName",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "query - 4"
+    }
+  ],
+  "fallbackResourceIds": [
+    "/subscriptions/574a07c8-b128-4a24-ac5f-1b8550b5a804/resourceGroups/logic-app/providers/Microsoft.OperationalInsights/workspaces/news-monitoring-workspace"
+  ],
+  "styleSettings": {
+    "paddingStyle": "none",
+    "spacingStyle": "none"
+  },
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}

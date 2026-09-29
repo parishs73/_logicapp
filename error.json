@@ -1,0 +1,28 @@
+{
+    "status": "Failed",
+    "error": {
+        "code": "DeploymentFailed",
+        "target": "/subscriptions/574a07c8-b128-4a24-ac5f-1b8550b5a804/resourceGroups/logic-app/providers/Microsoft.Resources/deployments/main",
+        "message": "At least one resource deployment operation failed. Please list deployment operations for details. Please see https://aka.ms/arm-deployment-operations for usage details.",
+        "details": [
+            {
+                "code": "ResourceDeploymentFailure",
+                "target": "/subscriptions/574a07c8-b128-4a24-ac5f-1b8550b5a804/resourceGroups/logic-app/providers/Microsoft.Resources/deployments/workflow",
+                "message": "The resource write operation failed to complete successfully, because it reached terminal provisioning state 'Failed'.",
+                "details": [
+                    {
+                        "code": "DeploymentFailed",
+                        "target": "/subscriptions/574a07c8-b128-4a24-ac5f-1b8550b5a804/resourceGroups/logic-app/providers/Microsoft.Resources/deployments/workflow",
+                        "message": "At least one resource deployment operation failed. Please list deployment operations for details. Please see https://aka.ms/arm-deployment-operations for usage details.",
+                        "details": [
+                            {
+                                "code": "ConnectionsParameterInvalid",
+                                "message": "The provided API connection parameter 'rss' is missing the required property 'id'."
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
