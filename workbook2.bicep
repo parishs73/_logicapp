@@ -37,7 +37,7 @@ resource workbook_name 'Microsoft.Insights/workbooks@2023-06-01' = {
           content: {
             version: 'KqlParameterItem/1.0'
             crossComponentResources: [
-             workspaceId
+              workspaceId
             ]
             stickySettings: {
               isSticky: true
@@ -235,6 +235,50 @@ resource workbook_name 'Microsoft.Insights/workbooks@2023-06-01' = {
           }
 
           name: 'query - 4'
+        }
+        {
+          type: 3
+          content: {
+            version: 'KqlItem/1.0'
+            query: '''AzureDiagnostics
+                      | where "{RSS_Feed}" in ("*", "",  "All") or resource_workflowName_s == "{RSS_Feed}"
+                      | where ResourceProvider == "MICROSOFT.LOGIC"
+                      | where Category == "WorkflowRuntime"
+                      | make-series Trend = count() on TimeGenerated step 5m by status_s, resource_workflowName_s, OperationName
+                      | extend Total = array_sum(Trend)
+                      | project resource_workflowName_s, OperationName, status_s, Total, Trend
+                      '''
+            size: 0
+            timeContextFromParameter: 'TimeRange'
+            queryType: 0
+            resourceType: 'microsoft.operationalinsights/workspaces'
+            gridSettings: {
+              formatters: [
+                {
+                  columnMatch: 'Total'
+                  formatter: 8
+                  formatOptions: {
+                    palette: 'green'
+                  }
+                  numberFormat: {
+                    unit: 17
+                    options: {
+                      style: 'decimal'
+                      minimumIntegerDigits: 1
+                    }
+                  }
+                }
+                {
+                  columnMatch: 'Trend'
+                  formatter: 10
+                  formatOptions: {
+                    palette: 'blue'
+                  }
+                }
+              ]
+            }
+          }
+          name: 'query - 4 - Copy'
         }
       ]
       isLocked: false
